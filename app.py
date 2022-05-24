@@ -1,8 +1,10 @@
+from turtle import width
 import streamlit as st
 import pandas as pd
 import numpy as np
 from db_fxns_atm import * 
 from db_fxns_riv import * 
+from PIL import Image
 
 def main():
 	st.title("App Marcas en Córners")
@@ -58,7 +60,26 @@ def main():
 			# st.write(result)
 			clean_df2 = pd.DataFrame(result2,columns=["Jugadora","Alineación","Prioridad 1","Prioridad 2","Prioridad 3"])
 			st.dataframe(clean_df2)
-			
+
+		with st.expander("Borrar Jugadora ATM"):
+
+			lista_jugadoras_del = [i[0] for i in view_all_nombres_jugadoras()]
+			delete_by_jugadora = st.selectbox("Jugadora ATM",lista_jugadoras_del)
+			#st.write(jugadora_result)
+
+			if st.button("Eliminar Jugadora ATM"):
+				delete_jugadora(delete_by_jugadora)
+				st.warning("{} eliminada con éxito".format(delete_by_jugadora))
+
+		with st.expander("Borrar Plantilla ATM"):
+			st.markdown("![Cuidadoooorrr](https://www.freeiconspng.com/uploads/warning-logo-png-symbols-warning-icon-17.png)")
+			st.subheader("Ojo, que con esto borramos a TODAS las jugadoras")
+
+			if st.button("Borrar Plantilla ATM"):
+				delete_equipo(jugadora,alineacion,prioridad1,prioridad2,prioridad3)
+				st.warning("Plantilla eliminada con éxito")
+
+
 	if choice == "Equipo Rival":
 		st.subheader("Añadir Jugadoras Rivales")
 
@@ -103,6 +124,24 @@ def main():
 			# st.write(result)
 			clean_df3 = pd.DataFrame(result3,columns=["Jugadora Rival","Alineación","Amenaza 1","Amenaza 2"])
 			st.dataframe(clean_df3)		
+
+		with st.expander("Borrar Jugadora Rival"):
+
+			lista_riv_del = [i[0] for i in view_all_nombres_riv()]
+			delete_by_riv = st.selectbox("Jugadora Rival",lista_riv_del)
+			#st.write(jugadora_result)
+
+			if st.button("Eliminar Jugadora Rival"):
+				delete_rival(delete_by_riv)
+				st.warning("{} eliminada con éxito".format(delete_by_riv))
+
+		with st.expander("Borrar Equipo Rival"):
+			st.markdown("![Cuidadoooorrr](https://www.freeiconspng.com/uploads/warning-logo-png-symbols-warning-icon-17.png)")
+			st.subheader("Pulsando el botón borramos a TODAS las jugadoras")
+
+			if st.button("Borrar Plantilla Rival"):
+				delete_equipo_rival(rival,alineacionriv,amenaza1,amenaza2)
+				st.warning("Plantilla rival eliminada con éxito")
 
 	if choice == "Marcas":
 		st.subheader("Asignación de marcas ABP")
@@ -173,18 +212,33 @@ def main():
 			st.dataframe(tit_dfr)
 
 	if choice == "Sustituciones":
-		st.subheader("Cambios en el rival")
-		result5 = view_all_data_riv()
+		col1,col2 = st.columns(2)
 
-		lista_titulares_riv = [i[0] for i in view_titulares_riv()]
-		selected_titular_riv = st.selectbox("Jugadora Titular",lista_titulares_riv)
+		with col1:
+			st.subheader("Cambios ATM")
 
-		lista_suplentes_riv = [i[0] for i in view_suplentes_riv()]
-		selected_suplente_riv = st.selectbox("Jugadora Suplente",lista_suplentes_riv)
+			lista_titulares = [i[0] for i in view_titulares()]
+			selected_titular = st.selectbox("Jugadora Titular",lista_titulares)
 
-		if st.button("Confirmar Cambio"):
-			edit_rival_tit_to_sup(selected_titular_riv,selected_suplente_riv)
-			st.success("{} sustituida con éxito por {}".format(selected_titular_riv,selected_suplente_riv))
+			lista_suplentes = [i[0] for i in view_suplentes()]
+			selected_suplente = st.selectbox("Jugadora Suplente",lista_suplentes)
+
+			if st.button("Confirmar Cambio ATM"):
+				edit_tit_to_sup(selected_titular,selected_suplente)
+				st.success("{} sustituida con éxito por {}".format(selected_titular,selected_suplente))
+
+		with col2:
+			st.subheader("Cambios en el rival")
+
+			lista_titulares_riv = [i[0] for i in view_titulares_riv()]
+			selected_titular_riv = st.selectbox("Jugadora Titular",lista_titulares_riv)
+
+			lista_suplentes_riv = [i[0] for i in view_suplentes_riv()]
+			selected_suplente_riv = st.selectbox("Jugadora Suplente",lista_suplentes_riv)
+
+			if st.button("Confirmar Cambio Rival"):
+				edit_rival_tit_to_sup(selected_titular_riv,selected_suplente_riv)
+				st.success("{} sustituida con éxito por {}".format(selected_titular_riv,selected_suplente_riv))
 
 
 if __name__ == '__main__':
